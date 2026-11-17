@@ -163,7 +163,11 @@ function openAi() {
   modal.querySelectorAll("[data-ai-question]").forEach(button => button.addEventListener("click", () => {
     const response = modal.querySelector(".ai-response");
     response.hidden = false;
-    response.innerHTML = `<strong>${button.textContent}</strong><p>${button.dataset.aiQuestion.includes("subscription") ? "You have three regular payments worth reviewing. The clearest opportunity is a recent price increase; reviewing it could save an estimated $84 a year without changing your everyday banking." : button.dataset.aiQuestion.includes("weekend") ? "Your planned bills are covered. Based on your current balances, a $320 spending limit would leave a comfortable buffer for the rest of the month." : "A good next step is the $200 offset transfer. It is optional, reversible and could reduce your loan interest by an estimated $120 over a year."}</p>`;
+    const heading = document.createElement("strong");
+    heading.textContent = button.textContent;
+    const detail = document.createElement("p");
+    detail.textContent = button.dataset.aiQuestion.includes("subscription") ? "You have three regular payments worth reviewing. The clearest opportunity is a recent price increase; reviewing it could save an estimated $84 a year without changing your everyday banking." : button.dataset.aiQuestion.includes("weekend") ? "Your planned bills are covered. Based on your current balances, a $320 spending limit would leave a comfortable buffer for the rest of the month." : "A good next step is the $200 offset transfer. It is optional, reversible and could reduce your loan interest by an estimated $120 over a year.";
+    response.replaceChildren(heading, detail);
   }));
 }
 
