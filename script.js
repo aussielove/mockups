@@ -3,6 +3,7 @@ const toast = document.querySelector("#toast");
 let toastTimer;
 
 const initialState = {
+  version: 3,
   annualSavings: 2480,
   sessionSavings: 0,
   actionsCompleted: 0,
@@ -21,8 +22,10 @@ const initialState = {
 let state = loadState();
 
 function loadState() {
-  try { return { ...initialState, ...JSON.parse(localStorage.getItem("westpac-demo-state") || "{}") }; }
-  catch { return { ...initialState }; }
+  try {
+    const saved = JSON.parse(localStorage.getItem("westpac-demo-state") || "null");
+    return saved?.version === initialState.version ? { ...initialState, ...saved } : structuredClone(initialState);
+  } catch { return structuredClone(initialState); }
 }
 
 function saveState() { localStorage.setItem("westpac-demo-state", JSON.stringify(state)); }
@@ -54,9 +57,19 @@ function homeView() {
         <div class="impact-progress"><span style="width:${Math.min(100, 38 + completed * 15)}%"></span></div>
         <div class="impact-bottom"><span>${completed} of ${state.nudges.length} recommendations completed</span><button data-view-jump="insights">View your plan →</button></div>
       </article>
+      <article class="forecast-card">
+        <div class="forecast-heading"><div><span class="eyebrow">Next 30 days</span><h2>Your cash flow is on track</h2></div><span class="forecast-status">Comfortable</span></div>
+        <p>After your planned bills and transfers, you could have <strong>$1,340</strong> available to spend while keeping your buffer intact.</p>
+        <div class="forecast-line"><span>Income expected <b>$3,800</b></span><span>Committed <b>$2,460</b></span><span>Available <b>$1,340</b></span></div>
+        <button data-toast="Cash flow forecast opened">See your cash flow →</button>
+      </article>
       <article class="panel nudge-panel">
         <div class="panel-heading"><div><span class="eyebrow">Recommended for you</span><h2>Small steps, real progress</h2></div><span class="sparkle">✧</span></div>
         ${state.nudges.map(nudge => nudgeRow(nudge)).join("")}
+      </article>
+      <article class="panel">
+        <div class="panel-heading"><div><span class="eyebrow">A goal worth keeping in sight</span><h2>Japan holiday</h2></div><button data-toast="Goals opened">All goals →</button></div>
+        <div class="goal-summary"><div class="goal-ring"><strong>41%</strong><span>complete</span></div><div class="goal-copy"><strong>$1,240 of $3,000</strong><span>Target: 30 June 2025</span><div class="goal-bar"><i></i></div><small>$180 monthly transfer is on track</small></div></div>
       </article>
       <article class="panel">
         <div class="panel-heading"><h2>♧ &nbsp;Accounts</h2><button data-toast="New account flow opened">New account</button></div>
@@ -154,6 +167,15 @@ function openAi() {
   }));
 }
 
+function openNotifications() {
+  const modal = document.createElement("div");
+  modal.className = "modal-backdrop";
+  modal.innerHTML = `<section class="notification-modal"><button class="modal-close" aria-label="Close">×</button><div class="notification-title"><span class="more-card-icon">♧</span><div><p class="eyebrow">Your updates</p><h2>Notifications</h2></div></div><div class="notification-item unread"><span class="notification-dot-icon">✧</span><div><strong>Your money review is ready</strong><p>We found three opportunities that may help you this month.</p><small>Just now</small></div></div><div class="notification-item"><span class="notification-dot-icon">ϟ</span><div><strong>Price change detected</strong><p>Review your Streaming Bundle before the next payment.</p><small>Today</small></div></div><div class="notification-item"><span class="notification-dot-icon">✓</span><div><strong>Weekly money summary</strong><p>You are $180 ahead of your savings plan this month.</p><small>Yesterday</small></div></div></section>`;
+  document.body.appendChild(modal);
+  modal.querySelector(".modal-close").addEventListener("click", () => modal.remove());
+  modal.addEventListener("click", event => { if (event.target === modal) modal.remove(); });
+}
+
 function wireActions() {
   document.querySelectorAll("[data-toast]").forEach(button => button.addEventListener("click", () => showToast(button.dataset.toast)));
   document.querySelectorAll("[data-view-jump]").forEach(button => button.addEventListener("click", () => render(button.dataset.viewJump)));
@@ -164,6 +186,8 @@ function wireActions() {
   document.querySelector("[data-intercept]")?.addEventListener("click", () => state.nudges.filter(nudge => !nudge.done).forEach(nudge => completeNudge(nudge.id)));
   document.querySelector("[data-ai]")?.addEventListener("click", openAi);
   document.querySelector("[data-reset]")?.addEventListener("click", () => { state = JSON.parse(JSON.stringify(initialState)); saveState(); render("home"); showToast("Demo data reset"); });
+  document.querySelector("#notifications-button")?.addEventListener("click", openNotifications);
+  document.querySelector("#back-button")?.addEventListener("click", () => currentView === "home" ? showToast("You are already on Home") : render("home"));
 }
 
 document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("click", () => render(item.dataset.view)));
