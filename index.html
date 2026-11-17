@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ef1018" />
+    <title>Westpac App Mockup</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="phone-app">
+      <div class="status-bar">
+        <strong>9:41</strong>
+        <div class="dynamic-island"><span class="island-spark">✳</span><span class="island-time">6:18</span></div>
+        <div class="status-icons"><span>▮▮</span><span>◔</span><span>▰</span></div>
+      </div>
+
+      <header class="app-header">
+        <button class="header-button" id="back-button" aria-label="Go back">‹</button>
+        <div class="header-title"><span class="westpac-w">W</span><strong>Westpac</strong></div>
+        <button class="header-button more-button" id="notifications-button" aria-label="Notifications">•••<i class="header-notification-dot"></i></button>
+      </header>
+
+      <div id="view" class="view"></div>
+
+      <nav class="bottom-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="home"><span class="nav-icon">W</span><span>Home</span></button>
+        <button class="nav-item" data-view="accounts"><span class="nav-icon">◌<sup>1</sup></span><span>Accounts</span></button>
+        <button class="nav-item" data-view="payments"><span class="nav-icon">$</span><span>Payments</span></button>
+        <button class="nav-item" data-view="insights"><span class="nav-icon">♧</span><span>Insights</span></button>
+        <button class="nav-item" data-view="more"><span class="nav-icon">⊞</span><span>More</span></button>
+      </nav>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
