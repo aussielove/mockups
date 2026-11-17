@@ -8,12 +8,12 @@ const initialState = {
   actionsCompleted: 0,
   activeTab: "safeblock",
   nudges: [
-    { id: "streaming", type: "Subscription", title: "Streaming Bundle", detail: "A price increase of $7/mo was detected.", impact: 84, action: "Intercept", done: false },
-    { id: "offset", type: "Offset", title: "Your offset could work harder", detail: "Move $200 from Choice for 30 days and reduce interest.", impact: 120, action: "Move $200", done: false },
-    { id: "cashback", type: "Rewards", title: "You have a cashback match waiting", detail: "Activate a Westpac partner offer before it expires.", impact: 32, action: "Activate", done: false }
+    { id: "streaming", type: "Subscription", title: "Streaming Bundle", detail: "A $7 monthly price increase was detected.", impact: 84, action: "Review charge", done: false },
+    { id: "offset", type: "Offset", title: "Put your offset to work", detail: "Move $200 from Choice for 30 days to reduce loan interest.", impact: 120, action: "Move $200", done: false },
+    { id: "cashback", type: "Rewards", title: "An offer matches your spending", detail: "Activate a Westpac partner offer before it expires.", impact: 32, action: "View offer", done: false }
   ],
   activity: [
-    { title: "Baseline savings found", detail: "Cash Flow IQ scanned your recurring money patterns", amount: 2480, date: "Today" }
+    { title: "Your money review is ready", detail: "Cash Flow IQ found opportunities across your accounts", amount: 2480, date: "Today" }
   ],
   preferences: { smartNudges: true, weeklyDigest: true, quietHours: false }
 };
@@ -35,7 +35,7 @@ function showToast(message) {
 }
 
 function headerChip() {
-  return `<span class="active-chip"><i></i> Shadow Private Banker active</span>`;
+  return `<span class="active-chip"><i></i> Cash Flow IQ is on</span>`;
 }
 
 function homeView() {
@@ -43,19 +43,19 @@ function homeView() {
   return `
     <section class="hero">
       <div class="hero-tools">${headerChip()}<button class="outline-button" data-toast="Westpac support is ready">♧ Contact us</button><button class="outline-button" aria-label="Profile">◯</button></div>
-      <p class="hero-kicker">Your money, working harder for you</p>
-      <h1>How can we help you this afternoon?</h1>
+      <p class="hero-kicker">Banking that fits around your life</p>
+      <h1>How can we help you today?</h1>
       <button class="search-box" data-toast="Search is ready"><span class="search-icon">⌕</span><span>Search your money, payments or help</span><span style="margin-left:auto">♩</span></button>
     </section>
     <section class="home-content">
-      <p class="welcome-label">Alex Morgan · Personalised for you</p>
+      <p class="welcome-label">Alex Morgan · Your personalised view</p>
       <article class="impact-card">
         <div class="impact-top"><div><span class="eyebrow light">Your impact this year</span><strong>${money(state.annualSavings)}<small> saved</small></strong></div><span class="impact-badge">↗ ${money(state.sessionSavings)} this session</span></div>
         <div class="impact-progress"><span style="width:${Math.min(100, 38 + completed * 15)}%"></span></div>
-        <div class="impact-bottom"><span>${completed} of ${state.nudges.length} recommendations actioned</span><button data-view-jump="insights">See your plan →</button></div>
+        <div class="impact-bottom"><span>${completed} of ${state.nudges.length} recommendations completed</span><button data-view-jump="insights">View your plan →</button></div>
       </article>
       <article class="panel nudge-panel">
-        <div class="panel-heading"><div><span class="eyebrow">Your next best actions</span><h2>Small moves, meaningful wins</h2></div><span class="sparkle">✧</span></div>
+        <div class="panel-heading"><div><span class="eyebrow">Recommended for you</span><h2>Small steps, real progress</h2></div><span class="sparkle">✧</span></div>
         ${state.nudges.map(nudge => nudgeRow(nudge)).join("")}
       </article>
       <article class="panel">
@@ -74,7 +74,7 @@ function accountCard(name, number, balance, credit = false) {
 }
 
 function nudgeRow(nudge) {
-  return `<div class="nudge-row ${nudge.done ? "done" : ""}"><span class="nudge-icon">${nudge.type === "Offset" ? "↗" : nudge.type === "Rewards" ? "♢" : "ϟ"}</span><div class="nudge-copy"><div><strong>${nudge.title}</strong><span class="nudge-impact">Potential ${money(nudge.impact)}/yr</span></div><p>${nudge.detail}</p></div><button class="nudge-action" data-nudge="${nudge.id}">${nudge.done ? "Done ✓" : nudge.action}</button></div>`;
+  return `<div class="nudge-row ${nudge.done ? "done" : ""}"><span class="nudge-icon">${nudge.type === "Offset" ? "↗" : nudge.type === "Rewards" ? "♢" : "ϟ"}</span><div class="nudge-copy"><div><strong>${nudge.title}</strong><span class="nudge-impact">Estimated ${money(nudge.impact)}/yr</span></div><p>${nudge.detail}</p></div><button class="nudge-action" data-nudge="${nudge.id}">${nudge.done ? "Completed ✓" : nudge.action}</button></div>`;
 }
 
 function accountsView() {
@@ -86,23 +86,23 @@ function paymentsView() {
 }
 
 function subscriptionCard(item) {
-  return `<article class="subscription ${item.done ? "locked" : ""}" data-subscription="${item.title}"><div class="subscription-main"><span class="merchant-mark">${item.title[0]}</span><div class="subscription-copy"><strong>${item.title}</strong><p>${item.detail}</p><span class="verified">◉ Ethoca Verified Receipt</span><span class="risk">${item.done ? "Actioned" : "Needs attention"}</span></div><div class="subscription-price">${item.id === "streaming" ? "$7/mo" : item.id === "offset" ? "$200" : "Offer"}<span>+${money(item.impact)}/yr</span></div></div><div class="sweep-row"><span><span class="rocket">♧</span>${item.id === "offset" ? "Auto-sweep to offset" : "Sweep to Life / Rocket Repay"}</span><button class="toggle ${item.done ? "" : "off"}" aria-label="Toggle sweep"></button></div><button class="lock-button" data-nudge="${item.id}">${item.done ? "✓ &nbsp; Action complete · Undo" : "ϟ &nbsp; ${item.action} · Save ${money(item.impact)}/yr"}</button></article>`;
+  return `<article class="subscription ${item.done ? "locked" : ""}" data-subscription="${item.title}"><div class="subscription-main"><span class="merchant-mark">${item.title[0]}</span><div class="subscription-copy"><strong>${item.title}</strong><p>${item.detail}</p><span class="verified">◉ Verified recurring payment</span><span class="risk">${item.done ? "Completed" : "Review recommended"}</span></div><div class="subscription-price">${item.id === "streaming" ? "$7/mo" : item.id === "offset" ? "$200" : "Offer"}<span>Est. ${money(item.impact)}/yr</span></div></div><div class="sweep-row"><span><span class="rocket">♧</span>${item.id === "offset" ? "Move automatically to offset" : "Move surplus to Westpac Life"}</span><button class="toggle ${item.done ? "" : "off"}" aria-label="Toggle automatic transfer"></button></div><button class="lock-button" data-nudge="${item.id}">${item.done ? "✓ &nbsp; Completed · Undo" : "ϟ &nbsp; ${item.action} · Est. ${money(item.impact)}/yr"}</button></article>`;
 }
 
 function insightContent(tab) {
   if (tab === "payday") return `<div class="insight-tab-content"><h2>Payday planner</h2><p>Make payday work for the whole month. Your personalised plan protects bills first, then gives every dollar a job.</p><div class="payday-meter"><span style="width:72%"></span></div><div class="planner-row"><span>Essentials protected</span><strong>$2,140</strong></div><div class="planner-row"><span>Available to enjoy</span><strong>$860</strong></div><button class="primary-button" data-toast="Payday plan applied">Apply my payday plan</button></div>`;
   if (tab === "products") return `<div class="insight-tab-content"><h2>Products that fit your life</h2><p>Not every product is right for everyone. These are matched to your cash flow, goals and current habits.</p><div class="recommendation"><span class="product-icon">↗</span><div><strong>Westpac Life</strong><small>Earn more on money you do not need this month</small></div><b>92% fit</b></div><div class="recommendation"><span class="product-icon">⌁</span><div><strong>Offset boost</strong><small>Use your existing home loan to reduce interest</small></div><b>86% fit</b></div><button class="primary-button" data-toast="Product comparison opened">Compare recommendations</button></div>`;
   if (tab === "shield") return `<div class="insight-tab-content"><h2>Scam Shield</h2><p>Your protection is on. We watch for unusual payment patterns and give you a moment to check before money leaves.</p><div class="shield-status"><span>✓</span><div><strong>Protected today</strong><small>3 payments checked · 0 blocked</small></div><b>ON</b></div><div class="shield-feature"><span>♢</span><div><strong>Safe contacts</strong><small>Only your trusted people can receive large first-time payments without a pause.</small></div></div><div class="shield-feature"><span>ϟ</span><div><strong>Payment pause</strong><small>We will pause suspicious payments so you stay in control.</small></div></div><button class="primary-button" data-toast="Protection settings opened">Review protection settings</button></div>`;
-  return `<div class="safe-block"><h2>SafeBlock subscription &amp; price-hike radar</h2><p>Westpac Choice ••4821 · ${state.nudges.length} verified opportunities · Simulated merchant controls</p><button class="intercept" data-intercept>ϟ &nbsp; 1-Tap action all recommendations (${money(state.nudges.reduce((sum, nudge) => sum + (nudge.done ? 0 : nudge.impact), 0))}/yr)</button>${state.nudges.map(subscriptionCard).join("")}</div>`;
+  return `<div class="safe-block"><h2>SafeBlock subscription review</h2><p>Westpac Choice ••4821 · ${state.nudges.length} opportunities identified from your regular payments</p><button class="intercept" data-intercept>ϟ &nbsp; Review all opportunities (${money(state.nudges.reduce((sum, nudge) => sum + (nudge.done ? 0 : nudge.impact), 0))}/yr estimated)</button>${state.nudges.map(subscriptionCard).join("")}</div>`;
 }
 
 function insightsView() {
   const tabs = ["safeblock", "payday", "products", "shield"];
-  return `<div class="insights-view"><section class="insight-hero"><div class="insight-kicker">Powered by Westpac Cash Flow IQ</div><h1>Save over ${money(state.annualSavings)}<br><span>in your future</span></h1><p class="insight-sub">Personalised nudges that make your money feel more yours.</p><div class="money-card"><div class="eyebrow">Total annual money found</div><div class="money-total">${money(state.annualSavings)}<small>/yr</small></div><div class="money-divider"></div><div class="money-stats"><div><strong>${money(state.sessionSavings)}</strong><span>Saved this<br>session</span></div><div><strong>${state.actionsCompleted}</strong><span>Nudges<br>actioned</span></div><div><strong>${state.nudges.length}</strong><span>Personalised<br>opportunities</span></div></div></div><button class="ai-prompt" data-ai>✧ &nbsp; Ask Westpac AI what to do next...</button></section><div class="insight-tabs">${tabs.map(tab => `<button class="${state.activeTab === tab ? "active" : ""}" data-tab="${tab}">${tab === "safeblock" ? "SafeBlock" : tab[0].toUpperCase() + tab.slice(1)}</button>`).join("")}</div>${insightContent(state.activeTab)}</div>`;
+  return `<div class="insights-view"><section class="insight-hero"><div class="insight-kicker">Westpac Cash Flow IQ</div><h1>Make more of<br><span>your money</span></h1><p class="insight-sub">Helpful prompts based on the way you bank, with you in control at every step.</p><div class="money-card"><div class="eyebrow">Estimated annual benefit</div><div class="money-total">${money(state.annualSavings)}<small>/yr</small></div><div class="money-divider"></div><div class="money-stats"><div><strong>${money(state.sessionSavings)}</strong><span>Recorded this<br>session</span></div><div><strong>${state.actionsCompleted}</strong><span>Recommendations<br>completed</span></div><div><strong>${state.nudges.length}</strong><span>Opportunities<br>identified</span></div></div></div><button class="ai-prompt" data-ai>✧ &nbsp; Ask Westpac what could help next...</button></section><div class="insight-tabs">${tabs.map(tab => `<button class="${state.activeTab === tab ? "active" : ""}" data-tab="${tab}">${tab === "safeblock" ? "SafeBlock" : tab[0].toUpperCase() + tab.slice(1)}</button>`).join("")}</div>${insightContent(state.activeTab)}</div>`;
 }
 
 function moreView() {
-  return `<section class="more-view"><p class="eyebrow">Make it yours</p><h1>More</h1><div class="personalisation-card"><span class="sparkle">✧</span><div><strong>Your app adapts to you</strong><p>Cash Flow IQ learns what matters and only nudges when it can help.</p></div><span class="status-on">ON</span></div><h2 class="more-section-title">Services</h2><div class="more-card" data-toast="Calculators opened"><span class="more-card-icon">▦</span><div><h3>Calculators</h3><p>Plan your next financial move</p></div></div><div class="more-card" data-toast="Contact us opened"><span class="more-card-icon">♧</span><div><h3>Contact us</h3><p>We're here to help</p></div></div><h2 class="more-section-title">Your preferences</h2><div class="settings-card">${settingRow("Smart nudges", "Only receive useful, timely prompts", "smartNudges")}${settingRow("Weekly money digest", "A Sunday summary of your progress", "weeklyDigest")}${settingRow("Quiet hours", "Pause non-urgent notifications after 8pm", "quietHours")}</div><button class="sign-out" data-reset>↻ &nbsp; Reset demo data</button></section>`;
+  return `<section class="more-view"><p class="eyebrow">Make it yours</p><h1>More</h1><div class="personalisation-card"><span class="sparkle">✧</span><div><strong>Your experience, tailored to you</strong><p>Cash Flow IQ learns what matters to you and only prompts you when it can help.</p></div><span class="status-on">ON</span></div><h2 class="more-section-title">Services</h2><div class="more-card" data-toast="Calculators opened"><span class="more-card-icon">▦</span><div><h3>Calculators</h3><p>Plan your next financial move</p></div></div><div class="more-card" data-toast="Contact us opened"><span class="more-card-icon">♧</span><div><h3>Contact us</h3><p>We're here to help</p></div></div><h2 class="more-section-title">Your preferences</h2><div class="settings-card">${settingRow("Helpful reminders", "Receive timely prompts when they may benefit you", "smartNudges")}${settingRow("Weekly money summary", "A Sunday summary of your progress", "weeklyDigest")}${settingRow("Quiet hours", "Pause non-urgent notifications after 8pm", "quietHours")}</div><button class="sign-out" data-reset>↻ &nbsp; Reset demo data</button></section>`;
 }
 
 function settingRow(title, detail, key) {
@@ -127,14 +127,14 @@ function completeNudge(id) {
     state.annualSavings -= nudge.impact;
     state.sessionSavings = Math.max(0, state.sessionSavings - nudge.impact);
     state.actionsCompleted = Math.max(0, state.actionsCompleted - 1);
-    showToast("Action reversed — your plan has been updated");
+    showToast("Change reversed — your plan has been updated");
   } else {
     nudge.done = true;
     state.annualSavings += nudge.impact;
     state.sessionSavings += nudge.impact;
     state.actionsCompleted += 1;
-    state.activity.push({ title: `${nudge.title} actioned`, detail: `Cash Flow IQ recorded ${money(nudge.impact)} annual benefit`, amount: nudge.impact, date: "Just now" });
-    showToast(`${nudge.title} actioned — ${money(nudge.impact)} saved per year`);
+    state.activity.push({ title: `${nudge.title} completed`, detail: `Cash Flow IQ recorded an estimated ${money(nudge.impact)} annual benefit`, amount: nudge.impact, date: "Just now" });
+    showToast(`${nudge.title} completed — estimated ${money(nudge.impact)} per year`);
   }
   saveState();
   render(currentView);
@@ -143,14 +143,14 @@ function completeNudge(id) {
 function openAi() {
   const modal = document.createElement("div");
   modal.className = "modal-backdrop";
-  modal.innerHTML = `<section class="ai-modal"><button class="modal-close" aria-label="Close">×</button><span class="ai-spark">✧</span><p class="eyebrow">Westpac Cash Flow IQ</p><h2>Your Shadow Private Banker</h2><p class="modal-intro">I have reviewed your money patterns. What would you like to improve today?</p><div class="ai-suggestions"><button data-ai-question="How can I save more this month?">Save more this month</button><button data-ai-question="Which subscriptions should I review?">Review my subscriptions</button><button data-ai-question="Can I afford a weekend away?">Can I afford a weekend away?</button></div><div class="ai-response" hidden></div></section>`;
+  modal.innerHTML = `<section class="ai-modal"><button class="modal-close" aria-label="Close">×</button><span class="ai-spark">✧</span><p class="eyebrow">Westpac Cash Flow IQ</p><h2>Your money, made clearer</h2><p class="modal-intro">I’ve reviewed your recent money patterns. What would you like to understand or improve today?</p><div class="ai-suggestions"><button data-ai-question="How can I save more this month?">How can I save more this month?</button><button data-ai-question="Which subscriptions should I review?">Which payments should I review?</button><button data-ai-question="Can I afford a weekend away?">Can I afford a weekend away?</button></div><div class="ai-response" hidden></div></section>`;
   document.body.appendChild(modal);
   modal.querySelector(".modal-close").addEventListener("click", () => modal.remove());
   modal.addEventListener("click", event => { if (event.target === modal) modal.remove(); });
   modal.querySelectorAll("[data-ai-question]").forEach(button => button.addEventListener("click", () => {
     const response = modal.querySelector(".ai-response");
     response.hidden = false;
-    response.innerHTML = `<strong>${button.textContent}</strong><p>${button.dataset.aiQuestion.includes("subscription") ? "You have 3 recurring charges worth reviewing. Actioning the highest-confidence one could save $84/year without changing your day-to-day." : button.dataset.aiQuestion.includes("weekend") ? "Yes — your planned bills are covered. I suggest a $320 limit and keeping $540 as your comfort buffer." : "Your best next step is to action the $200 offset sweep. It is low effort and could save around $120/year based on your current loan balance."}</p>`;
+    response.innerHTML = `<strong>${button.textContent}</strong><p>${button.dataset.aiQuestion.includes("subscription") ? "You have three regular payments worth reviewing. The clearest opportunity is a recent price increase; reviewing it could save an estimated $84 a year without changing your everyday banking." : button.dataset.aiQuestion.includes("weekend") ? "Your planned bills are covered. Based on your current balances, a $320 spending limit would leave a comfortable buffer for the rest of the month." : "A good next step is the $200 offset transfer. It is optional, reversible and could reduce your loan interest by an estimated $120 over a year."}</p>`;
   }));
 }
 
